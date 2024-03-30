@@ -44,6 +44,7 @@ fn main() {
         println!("cargo:rustc-link-search=/usr/bin");
     }
     println!("cargo:rustc-link-lib=dylib=gcc");
+    println!("cargo:rustc-link-search={}", output.display());
 
     let target = variable!("TARGET");
     let mut fc_lib_type = "dylib";
