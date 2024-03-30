@@ -1,8 +1,8 @@
 // build.rs
 
-use std::process::Command;
-use std::env::{var};
+use std::env::var;
 use std::path::PathBuf;
+use std::process::Command;
 
 macro_rules! feature(
     ($name:expr) => (var(concat!("CARGO_FEATURE_", $name)).is_ok());
@@ -13,18 +13,30 @@ macro_rules! variable(
 );
 
 fn main() {
-    let kind = if feature!("STATIC") { "static" } else { "dylib" };
+    let kind = if feature!("STATIC") {
+        "static"
+    } else {
+        "dylib"
+    };
     let source = PathBuf::from("fortran");
     let output = PathBuf::from(variable!("OUT_DIR").replace(r"\", "/"));
-    let os = if cfg!(target_os = "macos"){"Macos"}
-             else if cfg!(target_os = "windows"){"Windows"}
-             else {"Linux"};
-    let make_cmd = if os == "Windows" { "mingw32-make" } else { "make" };
+    let os = if cfg!(target_os = "macos") {
+        "Macos"
+    } else if cfg!(target_os = "windows") {
+        "Windows"
+    } else {
+        "Linux"
+    };
+    let make_cmd = if os == "Windows" {
+        "mingw32-make"
+    } else {
+        "make"
+    };
     run(Command::new(make_cmd)
-                .arg(kind)
-                .arg(format!("OUTPUT={}", output.display()))
-                .arg(format!("OSNAME={}", os))
-                .current_dir(&source));
+        .arg(kind)
+        .arg(format!("OUTPUT={}", output.display()))
+        .arg(format!("OSNAME={}", os))
+        .current_dir(&source));
 
     println!("cargo:rustc-link-search={}", output.display());
     println!("cargo:rustc-link-lib={}=lbfgs", kind);
@@ -37,15 +49,20 @@ fn main() {
 
         // Poke $FC$ for static lib folder
         let fc_out = Command::new(variable!("FC"))
-                              .arg("-print-file-name=libgfortran.a")
-                              .output()
-                              .expect("Failed to find libgfortran.a");
+            .arg("-print-file-name=libgfortran.a")
+            .output()
+            .expect("Failed to find libgfortran.a");
         let fc_stdout = String::from_utf8(fc_out.stdout).expect("Invalid path to libgfortran.a");
         let fc_lib_cwd = PathBuf::from(fc_stdout.to_string());
-        let fc_lib_pwd = fc_lib_cwd.parent().expect("Path to libgfortran.a not found");
+        let fc_lib_pwd = fc_lib_cwd
+            .parent()
+            .expect("Path to libgfortran.a not found");
         println!("cargo:rustc-link-search={}", fc_lib_pwd.to_str().unwrap());
     }
 
+    if os == "Macos" {
+        println!("cargo:rustc-link-search=/opt/homebrew/bin/gfortran");
+    }
     println!("cargo:rustc-link-lib={}=gfortran", fc_lib_type);
 
     if target == "x86_64-apple-darwin" {
@@ -55,11 +72,13 @@ fn main() {
 fn run(command: &mut Command) {
     println!("Running: {:?}", command);
     match command.status() {
-        Ok(status) => if !status.success() {
-            panic!("`{:?}` failed: {}", command, status);
-        },
+        Ok(status) => {
+            if !status.success() {
+                panic!("`{:?}` failed: {}", command, status);
+            }
+        }
         Err(error) => {
             panic!("failed to execute `{:?}`: {}", command, error);
-        },
+        }
     }
 }
