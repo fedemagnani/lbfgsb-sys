@@ -39,10 +39,8 @@ fn main() {
         .current_dir(&source));
 
     println!("cargo:rustc-link-search={}", output.display());
-    if os == "Macos" {
-        println!("cargo:rustc-link-search=/opt/homebrew/bin");
-        println!("cargo:rustc-link-search=/usr/bin");
-    }
+    println!("cargo:rustc-link-search=/opt/homebrew/bin");
+    println!("cargo:rustc-link-search=/usr/bin");
 
     println!("cargo:rustc-link-lib={}=lbfgs", kind);
     println!("cargo:rustc-link-lib=dylib=gcc");
