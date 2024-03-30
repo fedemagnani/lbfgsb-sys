@@ -40,6 +40,9 @@ fn main() {
 
     println!("cargo:rustc-link-search={}", output.display());
     println!("cargo:rustc-link-lib={}=lbfgs", kind);
+    if os == "Macos" {
+        println!("cargo:rustc-link-search=/usr/bin");
+    }
     println!("cargo:rustc-link-lib=dylib=gcc");
 
     let target = variable!("TARGET");
@@ -61,7 +64,7 @@ fn main() {
     }
 
     if os == "Macos" {
-        println!("cargo:rustc-link-search=/opt/homebrew/bin/gfortran");
+        println!("cargo:rustc-link-search=/opt/homebrew/bin");
     }
     println!("cargo:rustc-link-lib={}=gfortran", fc_lib_type);
 
