@@ -19,7 +19,8 @@ fn main() {
         "dylib"
     };
     let source = PathBuf::from("fortran");
-    let output = PathBuf::from(variable!("OUT_DIR").replace(r"\", "/"));
+    // let output = PathBuf::from(variable!("OUT_DIR").replace(r"\", "/"));
+    let output = PathBuf::from("./");
     let os = if cfg!(target_os = "macos") {
         "Macos"
     } else if cfg!(target_os = "windows") {
@@ -46,7 +47,8 @@ fn main() {
     println!("cargo:rustc-link-lib={}=lbfgs", kind);
     println!("cargo:rustc-link-lib=dylib=gcc");
 
-    let target = variable!("TARGET");
+    // let target = variable!("TARGET");
+    let target = "";
     let mut fc_lib_type = "dylib";
     if target == "x86_64-apple-darwin" || target == "x86_64-pc-windows-gnu" {
         fc_lib_type = "static";
