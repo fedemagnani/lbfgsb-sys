@@ -40,11 +40,7 @@ fn main() {
 
     println!("cargo:rustc-link-search={}", output.display());
     println!("cargo:rustc-link-lib={}=lbfgs", kind);
-    if os == "Macos" {
-        println!("cargo:rustc-link-search=/usr/bin");
-    }
     println!("cargo:rustc-link-lib=dylib=gcc");
-    println!("cargo:rustc-link-search={}", output.display());
 
     let target = variable!("TARGET");
     let mut fc_lib_type = "dylib";
@@ -65,9 +61,14 @@ fn main() {
     }
 
     if os == "Macos" {
-        println!("cargo:rustc-link-search=/opt/homebrew/bin");
+        // println!("cargo:rustc-link-search=/opt/homebrew/bin");
+        println!(
+            "cargo:rustc-link-lib={}=/opt/homebrew/bin/gfortran",
+            fc_lib_type
+        );
+    } else {
+        println!("cargo:rustc-link-lib={}=gfortran", fc_lib_type);
     }
-    println!("cargo:rustc-link-lib={}=gfortran", fc_lib_type);
 
     if target == "x86_64-apple-darwin" {
         println!("cargo:rustc-link-lib={}=quadmath", fc_lib_type);
