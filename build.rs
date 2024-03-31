@@ -43,6 +43,8 @@ fn main() {
         println!("cargo:rustc-link-search=/opt/homebrew/Cellar/gcc/13.2.0/lib/gcc/");
         println!("cargo:rustc-link-search=/opt/homebrew/Cellar/gcc/13.2.0/lib/gcc/13");
         println!("cargo:rustc-link-search=/usr/bin");
+        println!("cargo:rustc-link-search=/usr/local/bin");
+        println!("cargo:rustc-link-search=/opt/local/lib");
     }
 
     println!("cargo:rustc-link-lib={}=lbfgs", kind);
