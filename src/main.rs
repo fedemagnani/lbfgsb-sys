@@ -38,12 +38,8 @@ fn main() {
         .arg(format!("OUTPUT={}", output.display()))
         .arg(format!("OSNAME={}", os))
         .current_dir(&source));
-
+    format!("OUTPUT={}", output.display());
     println!("cargo:rustc-link-search={}", output.display());
-    if os == "Macos" {
-        println!("cargo:rustc-link-search=/opt/homebrew/Cellar/gcc/13.2.0/lib/gcc/");
-    }
-
     println!("cargo:rustc-link-lib={}=lbfgs", kind);
     println!("cargo:rustc-link-lib=dylib=gcc");
 
