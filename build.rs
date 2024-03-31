@@ -37,10 +37,12 @@ fn main() {
         .arg(format!("OUTPUT={}", output.display()))
         .arg(format!("OSNAME={}", os))
         .current_dir(&source));
+    println!("cargo:rustc-link-search={}", output.display());
 
     let mut fc_lib_type = "dylib";
-    println!("cargo:rustc-link-search={}", output.display());
-    if os == "aarch64-apple-darwin" {
+    let target = variable!("TARGET");
+
+    if target == "aarch64-apple-darwin" {
         // Poke $FC$ for dynamic lib folder
         let fc_out = Command::new(variable!("FC"))
             .arg("-print-file-name=libgfortran.a")
@@ -68,7 +70,6 @@ fn main() {
     println!("cargo:rustc-link-lib={}=lbfgs", kind);
     println!("cargo:rustc-link-lib=dylib=gcc");
 
-    let target = variable!("TARGET");
     if target == "x86_64-apple-darwin" || target == "x86_64-pc-windows-gnu" {
         fc_lib_type = "static";
 
