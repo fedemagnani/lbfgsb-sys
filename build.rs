@@ -38,20 +38,37 @@ fn main() {
         .arg(format!("OSNAME={}", os))
         .current_dir(&source));
 
+    let mut fc_lib_type = "dylib";
     println!("cargo:rustc-link-search={}", output.display());
-    if os == "Macos" {
-        // println!("cargo:rustc-link-search=/opt/homebrew/Cellar/gcc/13.2.0/lib/gcc/");
-        // println!("cargo:rustc-link-search=/usr/bin");
-        // println!("cargo:rustc-link-search=/usr/local/bin");
-        println!("cargo:rustc-link-search=/opt/homebrew/Cellar/gcc/13.2.0/lib/gcc/current/gcc/aarch64-apple-darwin23/13");
-        println!("cargo:rustc-link-search=/opt/homebrew/Cellar/gcc/13.2.0/lib/gcc/current");
+    if os == "aarch64-apple-darwin" {
+        // Poke $FC$ for dynamic lib folder
+        let fc_out = Command::new(variable!("FC"))
+            .arg("-print-file-name=libgfortran.a")
+            .output()
+            .expect("Failed to find libgfortran.a");
+        let fc_stdout = String::from_utf8(fc_out.stdout).expect("Invalid path to libgfortran.a");
+        let fc_lib_cwd = PathBuf::from(fc_stdout.to_string());
+        let fc_lib_pwd = fc_lib_cwd
+            .parent()
+            .expect("Path to libgfortran.a not found");
+        println!("cargo:rustc-link-search={}", fc_lib_pwd.to_str().unwrap());
+        // Poke $FC$ for dynamic lib folder
+        let fc_out = Command::new(variable!("FC"))
+            .arg("-print-file-name=libgcc.a")
+            .output()
+            .expect("Failed to find libgcc.a");
+        let fc_stdout = String::from_utf8(fc_out.stdout).expect("Invalid path to libgcc.a");
+        let fc_lib_cwd = PathBuf::from(fc_stdout.to_string());
+        let fc_lib_pwd = fc_lib_cwd.parent().expect("Path to libgcc.a not found");
+        println!("cargo:rustc-link-search={}", fc_lib_pwd.to_str().unwrap());
+        // println!("cargo:rustc-link-search=/opt/homebrew/Cellar/gcc/13.2.0/lib/gcc/current/gcc/aarch64-apple-darwin23/13");
+        // println!("cargo:rustc-link-search=/opt/homebrew/Cellar/gcc/13.2.0/lib/gcc/current");
     }
 
     println!("cargo:rustc-link-lib={}=lbfgs", kind);
     println!("cargo:rustc-link-lib=dylib=gcc");
 
     let target = variable!("TARGET");
-    let mut fc_lib_type = "dylib";
     if target == "x86_64-apple-darwin" || target == "x86_64-pc-windows-gnu" {
         fc_lib_type = "static";
 
